@@ -1,0 +1,12 @@
+@import 'styles/variables.scss';
+
+.user--item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: $color-dark-grey;
+  color: $color-white;
+  margin: 0 25px;
+  padding: 10px 25px;
+}

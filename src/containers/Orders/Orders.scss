@@ -1,0 +1,17 @@
+@import 'styles/variables.scss';
+
+.order {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: $color-dark-grey;
+  color: $color-white;
+  margin: 0 25px;
+  padding: 10px 25px;
+
+  &--items-color {
+    width: 35px;
+    height: 35px;
+  }
+}
