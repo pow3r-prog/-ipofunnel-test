@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useState } from 'react'
+
+import ItemPopup from 'components/itemPopup/ItemPopup'
 
 import './Shop.scss'
 
@@ -13,8 +15,6 @@ type TShop = {
 }
 
 const Shop = (): React.ReactElement => {
-  const ref = useRef<HTMLDivElement>(null)
-  const [isPopupOpen, setPopupOpen] = useState<boolean>(false)
   const [isItem, setIsItem] = useState<TShop[]>(shop)
   const [input, setInput] = useState<TShop>({
     title: '',
@@ -23,23 +23,7 @@ const Shop = (): React.ReactElement => {
     color: '',
   })
 
-  useEffect(() => {
-    // TODO
-    const checkIfClickedOutside = (e: any) => {
-      if (isPopupOpen && ref.current && !ref?.current?.contains(e.target)) {
-        setPopupOpen(false)
-        document.body.style.overflowY = 'scroll'
-      }
-    }
-
-    document.addEventListener('mousedown', checkIfClickedOutside)
-
-    return () => {
-      document.removeEventListener('mousedown', checkIfClickedOutside)
-    }
-  }, [isPopupOpen])
-
-  const handleChange = (event: string, fieldName: string): void => {
+  const handleChangeItem = (fieldName: string, event: string): void => {
     setInput({
       ...input,
       [fieldName]: event,
@@ -47,25 +31,75 @@ const Shop = (): React.ReactElement => {
   }
 
   const addItem = (): void => {
-    const newTask = {
+    const newItem = {
       id: isItem.length + 1,
       title: input.title,
       count: input.count,
       price: input.price,
       color: input.color,
     }
-    if (input.title !== '' && input.price !== 0) {
+    if (input.title !== '') {
       setInput({ title: '', count: 0, price: 0, color: '' })
-      setIsItem([...isItem, newTask])
+      setIsItem([...isItem, newItem])
     } else {
       alert('Title must not be empty!')
     }
+  }
+
+  const updateItem = (idx: number | undefined): void => {
+    const updateState = isItem.map((item) => {
+      if (item.id === idx) {
+        return {
+          ...item,
+          title: input.title,
+          count: input.count,
+          price: input.price,
+          color: input.color,
+        }
+      }
+      return item
+    })
+    setInput({ title: '', count: 0, price: 0, color: '' })
+    setIsItem(updateState)
   }
 
   return (
     <div className='inner-container'>
       {isItem.map((item) => (
         <div className='shop--item' key={item.id}>
+          <ItemPopup
+            type='edit'
+            children={
+              <>
+                <input
+                  type='text'
+                  placeholder='Title'
+                  value={input.title}
+                  onChange={(e) => handleChangeItem('title', e.target.value)}
+                />
+                <input
+                  type='text'
+                  placeholder='Count'
+                  value={input.count}
+                  onChange={(e) => handleChangeItem('count', e.target.value)}
+                />
+                <input
+                  type='text'
+                  placeholder='Price'
+                  value={input.price}
+                  onChange={(e) => handleChangeItem('price', e.target.value)}
+                />
+                For color use #color
+                <input
+                  type='text'
+                  placeholder='Color'
+                  value={input.color}
+                  onChange={(e) => handleChangeItem('color', e.target.value)}
+                />
+              </>
+            }
+            isUpdated={() => updateItem(item.id)}
+          />
           <div className='shop--item-title'>{item.title}</div>
           <div className='shop--item-count'>{item.count} items</div>
           <div className='shop--item-price'>Price: {item.price}$</div>
@@ -75,52 +109,39 @@ const Shop = (): React.ReactElement => {
           />
         </div>
       ))}
-      <div
-        className='add--item-button'
-        onClick={() => {
-          setPopupOpen(!isPopupOpen)
-          document.body.style.overflowY = 'hidden'
-        }}
-      >
-        +
-      </div>
-      {isPopupOpen && (
-        <div className='item--popup' ref={ref}>
-          <input
-            type='text'
-            placeholder='Title'
-            value={input.title}
-            onChange={(e) => handleChange(e.target.value, 'title')}
-          ></input>
-          <input
-            type='text'
-            placeholder='Count'
-            value={input.count}
-            onChange={(e) => handleChange(e.target.value, 'count')}
-          ></input>
-          <input
-            type='text'
-            placeholder='Price'
-            value={input.price}
-            onChange={(e) => handleChange(e.target.value, 'price')}
-          ></input>
-          <input
-            type='text'
-            placeholder='Color'
-            value={input.color}
-            onChange={(e) => handleChange(e.target.value, 'color')}
-          ></input>
-          <button
-            onClick={() => {
-              setPopupOpen(!isPopupOpen)
-              document.body.style.overflowY = 'hidden'
-              addItem()
-            }}
-          >
-            Add
-          </button>
-        </div>
-      )}
+      <ItemPopup
+        type='add'
+        children={
+          <>
+            <input
+              type='text'
+              placeholder='Title'
+              value={input.title}
+              onChange={(e) => handleChangeItem('title', e.target.value)}
+            />
+            <input
+              type='text'
+              placeholder='Count'
+              value={input.count}
+              onChange={(e) => handleChangeItem('count', e.target.value)}
+            />
+            <input
+              type='text'
+              placeholder='Price'
+              value={input.price}
+              onChange={(e) => handleChangeItem('price', e.target.value)}
+            />
+            For color use #color
+            <input
+              type='text'
+              placeholder='Color'
+              value={input.color}
+              onChange={(e) => handleChangeItem('color', e.target.value)}
+            />
+          </>
+        }
+        isUpdated={addItem}
+      />
     </div>
   )
 }
